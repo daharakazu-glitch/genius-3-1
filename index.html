@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genius Speech — Part III Unit 1</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        .s { transition: background .2s; border-radius: 4px; }
+        .s.now { background: rgba(255,209,102,.28); }
+        .sec.dim { opacity: .35; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <div class="header-label">Genius 論理・表現 II &nbsp;·&nbsp; Part III Unit 1</div>
+        <div class="header-title">Model Speech — Shadowing Practice</div>
+        <div class="header-sub">One Small Action — Speech</div>
+    </div>
+
+    <div class="nav-row">
+        <a class="nav-link current" href="index.html">① Model</a>
+        <a class="nav-link" href="structure.html">② Logic &amp; Functions</a>
+        <a class="nav-link" href="listen.html">③ Put It Together</a>
+        <a class="nav-link" href="myspeech.html">④ Try It Out</a>
+    </div>
+
+    <div class="warn" id="warn"></div>
+
+    <div class="card">
+        <div class="card-label">🏃 Warm-up</div>
+        <div class="note">
+            <b>Do you do anything special to help society?</b><br>
+            YES ▶ What? &nbsp;/&nbsp; NO ▶ Why not?<br>
+            <span style="opacity:.75">Hints: beach clean-up / world hunger / global warming / eco-friendly / NPO / volunteer / no time</span>
+        </div>
+    </div>
+
+    <div class="card" style="padding:16px 20px;">
+        <div class="toolbar">
+            <div class="pill-group" id="lang-group">
+                <button class="pill on" data-v="en">English</button>
+                <button class="pill" data-v="ja">日本語</button>
+                <button class="pill" data-v="both">両方</button>
+            </div>
+            <div class="pill-group">
+                <button class="pill on" id="vis-btn">👁 テキスト表示</button>
+            </div>
+            <div class="pill-group">
+                <button class="pill on" id="audio-btn">🔊 音声同時再生 ON</button>
+            </div>
+            <div class="pill-group" id="speed-group">
+                <button class="pill" data-v="0.75">0.75×</button>
+                <button class="pill on" data-v="0.9">0.9×</button>
+                <button class="pill" data-v="1">1.0×</button>
+            </div>
+        </div>
+        <div class="toolbar" style="margin-top:10px;">
+            <span style="font-size:1.7rem;color:rgba(255,255,255,.6)">練習範囲：</span>
+            <div class="pill-group" id="range-group">
+                <button class="pill on" data-v="all">全文</button>
+                <button class="pill" data-v="intro">Introduction</button>
+                <button class="pill" data-v="body">Body</button>
+                <button class="pill" data-v="concl">Conclusion</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-label">📖 Model — Yui is making a speech at a speech contest.</div>
+        <div id="speech"></div>
+    </div>
+
+    <div class="card">
+        <div class="player">
+            <canvas class="wave" id="waveform" width="700" height="56"></canvas>
+            <div class="btn-row">
+                <div class="btn-col">
+                    <span class="phase-badge phase-listen">① 聴く</span>
+                    <button class="action-btn btn-listen" id="listen-btn">
+                        <span class="btn-icon" id="listen-icon">▶</span>
+                        <span id="listen-label">音声を聴く</span>
+                    </button>
+                </div>
+                <div class="btn-col">
+                    <span class="phase-badge phase-shadow">② シャドーイング</span>
+                    <button class="action-btn btn-shadow" id="shadow-btn">
+                        <span class="btn-icon" id="shadow-icon">🎙</span>
+                        <span id="shadow-label">録音開始</span>
+                    </button>
+                </div>
+            </div>
+            <p class="hint">
+                ① でモデル音声を確認 → ② を押すと<b>音声が流れながら録音</b>が始まります。<br>
+                文と文・段落と段落の間には、スピーチらしい「間（ポーズ）」が入ります。読み終わると自動で停止して採点されます。<br>
+                🎧 ヘッドフォン必須（スピーカーだとモデル音声をマイクが拾ってしまいます）<br>
+                「🔊 音声同時再生」をOFFにすると、音声なしの暗唱（スピーチ発表）モードになります。
+            </p>
+        </div>
+    </div>
+
+    <div id="result-holder"></div>
+
+    <div class="card">
+        <div class="card-label">💬 Q&amp;A — 審査員との質疑応答</div>
+        <div class="note">スピーチの後、審査員（Judge）が質問します。Judge の質問を聴き、Yui になりきって答えを暗唱しましょう。<br>
+            <b>Thank you for your question.</b> で答え始めるのがポイントです。</div>
+        <div id="qa-list"></div>
+    </div>
+
+</div>
+<script src="common.js"></script>
+<script>
+const SECTIONS = [
+    { key: 'intro', cls: 'sec-intro', tag: 'Introduction', memo: '聴衆を話題に惹きつける導入', s: [
+        ['When I became a high school student, I wanted to do something to contribute to society.', '高校生になったとき、私は社会に貢献するために何かをしたいと思いました。'],
+        ['However, I thought there wasn’t anything I could do that would make a difference.', 'しかし、自分にできることで変化をもたらせるものは何もないと思っていました。'],
+        ['I mean I am only a teenager, so how can I change the world?', 'つまり、私はただの10代なのに、どうやって世界を変えられるでしょうか。'],
+        ['Then one day I found a way and I would like to take this opportunity to tell you about it.', 'そんなある日、私はその方法を見つけたので、この機会にそれについてお話ししたいと思います。']
+    ]},
+    { key: 'body', cls: 'sec-body', tag: 'Body', memo: '活動に興味をもったきっかけ・活動の内容', s: [
+        ['One day when I was searching the Internet, I found an activity called Onigiri Action.', 'ある日インターネットで調べものをしていたとき、「おにぎりアクション」という活動を見つけました。'],
+        ['The name interested me, so I read more about it.', 'その名前に興味をひかれ、さらに詳しく読んでみました。'],
+        ['I was surprised to learn that the NPO that runs the activity donates school lunches to children all over the world.', 'その活動を運営しているNPOが、世界中の子どもたちに給食を寄付していると知って驚きました。'],
+        ['They raise money from people who post pictures of themselves eating onigiri.', '彼らは、おにぎりを食べている自分の写真を投稿する人々から資金を集めています。'],
+        ['In fact, over 200,000 people posted photos last year, which resulted in enough money to give 900,000 school lunches to children.', '実際、昨年は20万人以上が写真を投稿し、その結果、子どもたちに90万食の給食を届けるのに十分なお金が集まりました。'],
+        ['Since I love onigiri, I also participated in this project.', '私はおにぎりが大好きなので、私もこのプロジェクトに参加しました。']
+    ]},
+    { key: 'concl', cls: 'sec-concl', tag: 'Conclusion', memo: '活動から学んだこと・聴衆へのメッセージ', s: [
+        ['I learned about world hunger in my classes at school and by watching the news.', '私は学校の授業やニュースを見ることで、世界の飢餓について学びました。'],
+        ['However, I never imagined that one small action, like eating an onigiri, would be a way for me to change the world.', 'しかし、おにぎりを食べるといった一つの小さな行動が、私にとって世界を変える方法になるとは想像もしていませんでした。'],
+        ['It made me realize that we can all contribute to society.', 'そのことで、私たちは皆、社会に貢献できるのだと気づきました。'],
+        ['Why don’t you give it a try?', 'あなたも試してみませんか。']
+    ]}
+];
+
+const QA = [
+    { label: 'Judge（質問）', en: 'Thank you for your inspiring speech. Could you tell me more about the people who are posting pictures? Are they all Japanese?',
+      ja: '感動的なスピーチをありがとうございました。写真を投稿している人々について、もっと教えていただけますか。全員日本人ですか。' },
+    { label: 'Yui（応答）', en: 'Thank you for your question. Although this project began in Japan, now people in over 30 countries post pictures of themselves eating onigiri. It is really interesting to see how onigiri looks around the world.',
+      ja: 'ご質問ありがとうございます。このプロジェクトは日本で始まりましたが、今では30か国以上の人々が、おにぎりを食べている自分の写真を投稿しています。世界中でおにぎりがどのように見えるのかを見るのは本当に興味深いです。' }
+];
+
+const st = { lang: 'en', visible: true, speed: 0.9, withAudio: true, range: 'all', listening: false, shadowing: false };
+let player = null, rec = null;
+
+function render() {
+    let n = 0;
+    document.getElementById('speech').innerHTML = SECTIONS.map(sec => {
+        const en = sec.s.map(x => { n++; return `<span class="s" id="s-${n - 1}"><span class="sn">${n}</span>${escapeHtml(x[0])}</span>`; }).join(' ');
+        const ja = sec.s.map(x => x[1]).join('');
+        return `<div class="sec ${sec.cls}" id="sec-${sec.key}">
+            <div class="sec-tag">${sec.tag}<small>${sec.memo}</small></div>
+            <div class="en para-en">${en}</div>
+            <div class="ja para-ja">${escapeHtml(ja)}</div></div>`;
+    }).join('');
+    applyView();
+}
+
+function applyView() {
+    document.querySelectorAll('.para-en').forEach(e => {
+        e.classList.toggle('lang-hidden', st.lang === 'ja');
+        e.classList.toggle('blurred', !st.visible);
+    });
+    document.querySelectorAll('.para-ja').forEach(e => {
+        e.classList.toggle('lang-hidden', st.lang === 'en');
+        e.classList.toggle('blurred', !st.visible);
+    });
+    document.querySelectorAll('.qa-en').forEach(e => e.classList.toggle('blurred', !st.visible));
+    document.querySelectorAll('.qa-ja').forEach(e => e.classList.toggle('lang-hidden', st.lang === 'en'));
+    SECTIONS.forEach(sec => document.getElementById('sec-' + sec.key)
+        .classList.toggle('dim', st.range !== 'all' && st.range !== sec.key));
+}
+
+// Sentences in the selected range, with global index and pause after each
+function targetChunks() {
+    const out = [];
+    let n = 0;
+    SECTIONS.forEach((sec, si) => {
+        sec.s.forEach((x, k) => {
+            if (st.range === 'all' || st.range === sec.key) {
+                const lastInSec = k === sec.s.length - 1;
+                out.push({ text: x[0], idx: n, pause: lastInSec ? 1100 : 450 });
+            }
+            n++;
+        });
+    });
+    return out;
+}
+function targetText() { return targetChunks().map(c => c.text).join(' '); }
+
+function mark(idx) {
+    document.querySelectorAll('.s.now').forEach(e => e.classList.remove('now'));
+    if (idx !== null) {
+        const el = document.getElementById('s-' + idx);
+        if (el) el.classList.add('now');
+    }
+}
+
+function setListenUI(on) {
+    st.listening = on;
+    document.getElementById('listen-btn').classList.toggle('playing', on);
+    document.getElementById('listen-icon').textContent = on ? '⏹' : '▶';
+    document.getElementById('listen-label').textContent = on ? '停止' : '音声を聴く';
+    if (!on) mark(null);
+}
+
+function playModel(onDone) {
+    const chunks = targetChunks();
+    player = speakChunks(chunks, st.speed, {
+        onstart: () => document.getElementById('listen-btn').classList.add('playing'),
+        onchunk: i => mark(chunks[i].idx),
+        onend: () => { setListenUI(false); onDone && onDone(); }
+    });
+}
+
+function toggleListen() {
+    if (st.shadowing) return;
+    if (st.listening) { player && player.cancel(); setListenUI(false); return; }
+    if (!getVoice()) { showWarn('⚠️ 音声が見つかりません。Chrome / Edge をお使いください。'); return; }
+    setListenUI(true);
+    playModel();
+}
+
+async function toggleShadow() {
+    if (st.shadowing) { stopShadow(); return; }
+    player && player.cancel(); setListenUI(false);
+    if (!hasRecognition()) { showWarn('⚠️ 音声認識に非対応のブラウザです。Chrome / Edge をご利用ください。'); return; }
+    rec = new Recorder({ canvas: document.getElementById('waveform') });
+    try { await rec.start(); } catch (_) { alert('マイクへのアクセスを許可してください。'); return; }
+    st.shadowing = true;
+    document.getElementById('r-section').classList.remove('show');
+    setShadowUI(true);
+    if (st.withAudio) setTimeout(() => {
+        if (!st.shadowing) return;
+        playModel(() => setTimeout(() => { if (st.shadowing) stopShadow(); }, 2500));
+    }, 700);
+}
+
+async function stopShadow() {
+    st.shadowing = false;
+    player && player.cancel();
+    setListenUI(false);
+    setShadowUI(false);
+    const out = await rec.stop();
+    renderResult('r-', compare(targetText(), out.text), out);
+}
+
+function setShadowUI(on) {
+    document.getElementById('shadow-btn').classList.toggle('recording', on);
+    document.getElementById('shadow-icon').textContent = on ? '⏹' : '🎙';
+    document.getElementById('shadow-label').textContent = on ? '停止' : '録音開始';
+}
+
+function showWarn(msg) {
+    const el = document.getElementById('warn');
+    el.textContent = msg; el.style.display = 'block';
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    render();
+    document.getElementById('result-holder').innerHTML = resultBlockHtml('r-', '結果',
+        '<div class="center" style="margin-top:20px"><button class="main-btn" onclick="resetAll()">🔄 もう一度</button></div>');
+    buildItemList(document.getElementById('qa-list'),
+        QA.map(q => ({ ...q, html: `<span class="qa-en">${escapeHtml(q.en)}</span>` })), () => st.speed, 'qa-');
+    document.querySelectorAll('#qa-list .ja').forEach(e => e.classList.add('qa-ja'));
+
+    pillGroup('lang-group', v => { st.lang = v; applyView(); });
+    pillGroup('speed-group', v => { st.speed = parseFloat(v); });
+    pillGroup('range-group', v => { st.range = v; applyView(); });
+    document.getElementById('vis-btn').onclick = e => {
+        st.visible = !st.visible;
+        e.target.classList.toggle('on', st.visible);
+        e.target.textContent = st.visible ? '👁 テキスト表示' : '🙈 テキスト非表示';
+        applyView();
+    };
+    document.getElementById('audio-btn').onclick = e => {
+        st.withAudio = !st.withAudio;
+        e.target.classList.toggle('on', st.withAudio);
+        e.target.textContent = st.withAudio ? '🔊 音声同時再生 ON' : '🔇 音声同時再生 OFF';
+    };
+    document.getElementById('listen-btn').onclick = toggleListen;
+    document.getElementById('shadow-btn').onclick = toggleShadow;
+    applyView();
+    showWarnIfNoSR();
+});
+
+function resetAll() {
+    speechSynthesis.cancel();
+    document.getElementById('r-section').classList.remove('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

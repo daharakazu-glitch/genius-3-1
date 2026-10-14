@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logic and Functions — Part III Unit 1</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        .tt-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 1.8rem; line-height: 1.8; margin: 8px 0; }
+        .tt-row select { max-width: 100%; }
+        .tt-ev { display: none; width: 100%; font-size: 1.6rem; color: rgba(255,255,255,.6); padding-left: 8px; }
+        .tt-ev.show { display: block; }
+        .fio { font-size: 2.1rem; line-height: 2; }
+        .fio select { font-size: 1.7rem; }
+        .fn-frames { font-size: 1.8rem; line-height: 1.9; color: #f0f0f0; margin-bottom: 10px; }
+        .fn-frames b { color: #ffd166; }
+        .fn-head { font-size: 2rem; font-weight: 700; color: #ffd166; margin: 18px 0 8px; }
+        .score-line { font-size: 2rem; font-weight: 700; margin-left: 12px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <div class="header-label">Genius 論理・表現 II &nbsp;·&nbsp; Part III Unit 1</div>
+        <div class="header-title">Logic and Structure &amp; Functions</div>
+        <div class="header-sub">One Small Action — Speech</div>
+    </div>
+
+    <div class="nav-row">
+        <a class="nav-link" href="index.html">① Model</a>
+        <a class="nav-link current" href="structure.html">② Logic &amp; Functions</a>
+        <a class="nav-link" href="listen.html">③ Put It Together</a>
+        <a class="nav-link" href="myspeech.html">④ Try It Out</a>
+    </div>
+
+    <div class="warn" id="warn"></div>
+
+    <div class="card">
+        <div class="card-label">🧱 Logic and Structure</div>
+        <div class="note">
+            スピーチでは <b>Introduction → Body → Conclusion</b> という枠組みにのっとって論旨を展開することを心がけます。<br>
+            <b>Introduction</b>：聞き手を惹きつける工夫をしましょう。<br>
+            <b>Body</b>：主観的な発言は避け、なぜそう思うのか、聞き手が納得する根拠を論理的に提示しましょう。<br>
+            <b>Conclusion</b>：主張を簡潔にまとめます。
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-label">💡 Think It Through — Model の構成</div>
+        <div class="note">Model（Yui のスピーチ）の内容に合うように、( 1 )〜( 10 ) に入る語句を選びましょう。</div>
+        <div id="tt"></div>
+        <div class="center" style="margin-top:14px">
+            <button class="main-btn" id="tt-check">✔ 答え合わせ</button>
+            <button class="main-btn sub" id="tt-reset">リセット</button>
+            <span class="score-line" id="tt-score"></span>
+        </div>
+    </div>
+
+    <div class="card" style="padding:16px 20px;">
+        <div class="toolbar">
+            <div class="pill-group">
+                <button class="pill on" id="ja-btn">日本語訳 表示</button>
+            </div>
+            <div class="pill-group">
+                <button class="pill on" id="vis-btn">👁 英文表示</button>
+            </div>
+            <div class="pill-group" id="speed-group">
+                <button class="pill" data-v="0.7">0.7×</button>
+                <button class="pill on" data-v="0.85">0.85×</button>
+                <button class="pill" data-v="1">1.0×</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-label">🗣 Functions — スピーチで使える表現（暗唱用）</div>
+        <div id="functions"></div>
+        <p class="hint">▶ Play で音声を聴き、● Record で暗唱してから停止すると採点されます。「英文表示」を OFF にして暗唱にチャレンジしましょう。</p>
+    </div>
+
+    <div class="card">
+        <div class="card-label">🧩 Figure It Out</div>
+        <div class="note">Complete the speech below by using the phrases in the box.<br>
+            a. Now, let’s go on to &nbsp;/&nbsp; b. I would like to speak to you today about &nbsp;/&nbsp; c. How do you think you can</div>
+        <div class="fio" id="fio"></div>
+        <div class="center" style="margin-top:14px">
+            <button class="main-btn" id="fio-check">✔ 答え合わせ</button>
+            <span class="score-line" id="fio-score"></span>
+        </div>
+        <div id="fio-practice" style="display:none;margin-top:18px">
+            <div class="cmp-label">完成したスピーチで練習</div>
+            <div id="fio-list"></div>
+        </div>
+    </div>
+
+</div>
+<script src="common.js"></script>
+<script>
+// ---------- Think It Through ----------
+const TT_ANSWERS = [
+    '社会に貢献', '自分にできることで変化をもたらせるものは何もない', 'どうやって世界を変えられるのか',
+    'おにぎりアクション', '給食を寄付', 'おにぎりを食べている自分の',
+    '学校の授業やニュース', 'おにぎりを食べる', '世界を変える方法になる', '私たちは皆、社会に貢献'
+];
+const TT_EVIDENCE = [
+    '① …I wanted to do something to contribute to society.',
+    '② However, I thought there wasn’t anything I could do that would make a difference.',
+    '③ …so how can I change the world?',
+    '⑤ …I found an activity called Onigiri Action.',
+    '⑦ …the NPO that runs the activity donates school lunches to children all over the world.',
+    '⑧ They raise money from people who post pictures of themselves eating onigiri.',
+    '⑪ I learned about world hunger in my classes at school and by watching the news.',
+    '⑫ …one small action, like eating an onigiri, …',
+    '⑫ …would be a way for me to change the world.',
+    '⑬ It made me realize that we can all contribute to society.'
+];
+// Each line: [section, text with {n} blanks]
+const TT_LINES = [
+    ['Introduction', '・高校入学時、（{1}）になることをしたいと考えていた。'],
+    ['Introduction', '・しかし（{2}）と思い、10代の若者が（{3}）と疑問に思っていた。'],
+    ['Introduction', '・しかしある時、私にもできる方法を見つけた。'],
+    ['Body', '・ある日、インターネットで調べていると（{4}）という活動を見つけた。'],
+    ['Body', '・名称に惹かれ、読み進めると、活動を行っているNPOは世界中の子どもに（{5}）していることがわかった。'],
+    ['Body', '・人々がSNSに（{6}）写真を投稿することで資金を集めている。'],
+    ['Body', '・昨年だけでも20万人が参加し、90万食の給食が世界中に届けられた。'],
+    ['Body', '・私もおにぎりが好きなので、この活動に参加することにした。'],
+    ['Conclusion', '・（{7}）で食糧危機については知ってはいたが、（{8}）という小さな行動が（{9}）とは思いもよらなかった。'],
+    ['Conclusion', '・この経験を通して（{10}）できるということに気づいた。']
+];
+const SEC_CLS = { Introduction: 'sec-intro', Body: 'sec-body', Conclusion: 'sec-concl' };
+
+function shuffled(a) {
+    const b = a.slice();
+    for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; }
+    return b;
+}
+
+function renderTT() {
+    const opts = shuffled(TT_ANSWERS);
+    const sel = n => `<select class="blank" data-n="${n}"><option value="">(${n}) を選択</option>${opts.map(o => `<option>${o}</option>`).join('')}</select>`;
+    let html = '', cur = null;
+    TT_LINES.forEach(([sec, text]) => {
+        if (sec !== cur) {
+            if (cur) html += '</div>';
+            html += `<div class="sec ${SEC_CLS[sec]}"><div class="sec-tag">${sec}</div>`;
+            cur = sec;
+        }
+        const nums = [...text.matchAll(/\{(\d+)\}/g)].map(m => +m[1]);
+        html += `<div class="tt-row"><span>${text.replace(/\{(\d+)\}/g, (_, n) => sel(+n))}</span>
+            ${nums.map(n => `<div class="tt-ev" id="ev-${n}">(${n}) 根拠：${escapeHtml(TT_EVIDENCE[n - 1])}</div>`).join('')}</div>`;
+    });
+    html += '</div>';
+    document.getElementById('tt').innerHTML = html;
+    document.getElementById('tt-score').textContent = '';
+}
+
+function checkTT() {
+    let ok = 0;
+    document.querySelectorAll('#tt select').forEach(s => {
+        const n = +s.dataset.n, right = s.value === TT_ANSWERS[n - 1];
+        if (right) ok++;
+        s.classList.toggle('ok', right); s.classList.toggle('ng', !right);
+        document.getElementById('ev-' + n).classList.add('show');
+    });
+    document.getElementById('tt-score').textContent = `${ok} / 10 正解` + (ok === 10 ? ' 🎉' : '');
+}
+
+// ---------- Functions ----------
+const FUNCTIONS = [
+    { head: '① 話題を切り出す', frames: '<b>The subject of my speech today is ~.</b>（本日の私のスピーチの主題は～）<br><b>We are going to talk about ~ [I would like to speak to you about ~].</b>（～について話したいと思います）',
+      items: [
+        { en: 'I would like to speak to you about how I use a paper dictionary.', ja: '私の紙の辞書の使い方について話したいと思います。', label: '例文' },
+        { en: 'Then one day I found a way and I would like to take this opportunity to tell you about it.', ja: 'そんなある日、私はその方法を見つけたので、この機会にそれについてお話ししたいと思います。', label: 'Model ④ より' },
+        { en: 'Today I would like to share with you my one small action to make a difference in society.', ja: '今日は、社会に変化をもたらすための私の小さな行動を皆さんにお伝えしたいと思います。', label: 'Put It Together（Haruto）より' }
+      ] },
+    { head: '② 関心を引く', frames: '<b>Did you know that ...?</b>（…ということを知っていましたか）<br><b>Can you guess why ...?</b>（なぜ…なのかわかりますか）<br><b>Before I start, I’d like to share a quick story about ....</b>（始める前に…についてのエピソードをちょっと紹介いたします）',
+      items: [
+        { en: 'Can you guess why I became an English teacher?', ja: '私がなぜ英語教師になったかわかりますか。', label: '例文' },
+        { en: 'I mean I am only a teenager, so how can I change the world?', ja: 'つまり、私はただの10代なのに、どうやって世界を変えられるでしょうか。', label: 'Model ③ より（問いかけで惹きつける）' },
+        { en: 'Have you ever offered an elderly person your seat on the train or bus?', ja: '電車やバスで、お年寄りに席を譲ったことはありますか。', label: 'Put It Together（Haruto）より' }
+      ] },
+    { head: '③ 次の話題に移る', frames: '<b>Now, I’d like to turn to ~ [Moving on to the next part, I’d like to talk about ~].</b>（～に移りたいと思います［次のパートに移って～に関して述べたいと思います］）<br><b>Now, let me talk about ~ [Now, let’s go on to ~].</b>（続いて～に移らせてください）',
+      items: [
+        { en: 'Now, let’s go on to the next part.', ja: 'では、次のパートに移りましょう。', label: '例文' },
+        { en: 'Moving on to the next part, I’d like to talk about our goals.', ja: '次のパートに移って、私たちの目標についてお話ししたいと思います。', label: '言いかえ練習' }
+      ] }
+];
+
+let speed = 0.85;
+
+function renderFunctions() {
+    const box = document.getElementById('functions');
+    box.innerHTML = FUNCTIONS.map((f, i) => `
+        <div class="fn-head">${f.head}</div>
+        <div class="fn-frames">${f.frames}</div>
+        <div id="fn-${i}"></div>`).join('');
+    FUNCTIONS.forEach((f, i) => buildItemList(document.getElementById('fn-' + i), f.items, () => speed, `f${i}-`));
+}
+
+// ---------- Figure It Out ----------
+const FIO_ANS = ['b', 'c', 'a'];
+let fioBuilt = false;
+const FIO_PHRASE = {
+    a: 'Now, let’s go on to', b: 'I would like to speak to you today about', c: 'How do you think you can'
+};
+const FIO_TEXT = '{1} our project. {2} make a big change in the world? Some of you may be thinking, “Some big global companies can make more of an impact than I can.” That may be true, but there are seven billion people on this planet; what if the seven billion of us each made a small change? Thinking like that is what led us to start up the One Small Action Project. {3} our goals.';
+
+function renderFIO() {
+    const sel = n => `<select class="blank" data-n="${n}"><option value="">(${n}) ___</option>
+        ${['a', 'b', 'c'].map(k => `<option value="${k}">${k}. ${FIO_PHRASE[k]}</option>`).join('')}</select>`;
+    document.getElementById('fio').innerHTML = FIO_TEXT.replace(/\{(\d)\}/g, (_, n) => sel(+n));
+}
+
+function checkFIO() {
+    let ok = 0;
+    document.querySelectorAll('#fio select').forEach(s => {
+        const right = s.value === FIO_ANS[+s.dataset.n - 1];
+        if (right) ok++;
+        s.classList.toggle('ok', right); s.classList.toggle('ng', !right);
+    });
+    document.getElementById('fio-score').textContent = `${ok} / 3 正解` + (ok === 3 ? ' 🎉' : '');
+    if (ok === 3 && !fioBuilt) {
+        fioBuilt = true;
+        const full = FIO_TEXT.replace(/\{(\d)\}/g, (_, n) => FIO_PHRASE[FIO_ANS[n - 1]]);
+        const parts = full.split(/(?<=[.?])\s+(?=[A-Z“])/);
+        const items = [
+            { en: parts.slice(0, 2).join(' '), label: 'Introduction ①（話題を切り出す → 問いかけ）' },
+            { en: parts.slice(2, -1).join(' '), label: 'Introduction ②（聞き手の考えに触れる）' },
+            { en: parts[parts.length - 1], label: '次の話題に移る' }
+        ];
+        buildItemList(document.getElementById('fio-list'), items, () => speed, 'fio-');
+        document.getElementById('fio-practice').style.display = 'block';
+        applyView();
+    }
+}
+
+// ---------- View toggles ----------
+let showJa = true, visible = true;
+function applyView() {
+    document.querySelectorAll('.item .ja').forEach(e => e.classList.toggle('lang-hidden', !showJa));
+    document.querySelectorAll('.item .en').forEach(e => e.classList.toggle('blurred', !visible));
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    renderTT(); renderFunctions(); renderFIO();
+    document.getElementById('tt-check').onclick = checkTT;
+    document.getElementById('tt-reset').onclick = renderTT;
+    document.getElementById('fio-check').onclick = checkFIO;
+    pillGroup('speed-group', v => { speed = parseFloat(v); });
+    document.getElementById('ja-btn').onclick = e => {
+        showJa = !showJa; e.target.classList.toggle('on', showJa);
+        e.target.textContent = showJa ? '日本語訳 表示' : '日本語訳 非表示';
+        applyView();
+    };
+    document.getElementById('vis-btn').onclick = e => {
+        visible = !visible; e.target.classList.toggle('on', visible);
+        e.target.textContent = visible ? '👁 英文表示' : '🙈 英文非表示';
+        applyView();
+    };
+    showWarnIfNoSR();
+});
+</script>
+</body>
+</html>
